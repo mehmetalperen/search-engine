@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Search Results</title>
+   <style>
+       body {
+           background-color: #222;
+           color: #eee;
+           font-family: Arial, sans-serif;
+           margin: 0;
+           padding: 0;
+       }
+
+       .container {
+           max-width: 800px;
+           margin: 0 auto;
+           padding: 20px;
+       }
+
+       h2 {
+           margin-bottom: 10px;
+       }
+
+       form {
+           margin-bottom: 20px;
+       }
+
+       input[type="text"] {
+           width: 300px;
+           padding: 5px;
+           border: none;
+           background-color: #333;
+           color: #eee;
+       }
+
+       button {
+           padding: 5px 10px;
+           border: none;
+           background-color: #777;
+           color: #eee;
+           cursor: pointer;
+       }
+
+       h1 {
+           margin-top: 30px;
+       }
+
+       ul {
+           list-style-type: none;
+           padding: 0;
+       }
+
+       li {
+           margin-bottom: 10px;
+       }
+
+       a {
+           text-decoration: none;
+           color: #00a0e9;
+       }
+   </style>
+</head>
+<body>
+   <div class="container">
+       <h2>Perform Another Search</h2>
+       <form action="{{ url_for('perform_search') }}" method="GET">
+           <input type="text" name="query" placeholder="Enter your search query" required>
+           <button type="submit">Search</button>
+       </form>
+
+       {% if query %}
+           <h1>Search Results for "{{ query }}"</h1>
+           <h2>Took {{ search_time }} ms</h2>
+           <ul>
+                <li>Your top results are:</li>
+               {% for result, summary in results %}
+                   <li><a href="{{ result }}">{{ result }}</a>  <p>{{summary}}</p>  </li>
+               {% endfor %}
+           </ul>
+
+           {% if results %}
+               {% if page > 1 %}
+                   <a href="{{ url_for('perform_search', query=query, page=page-1)|replace('+', '%20') }}">Previous Page</a>
+               {% endif %}
+               {% if num_remaining > 0 %}
+                   <a href="{{ url_for('perform_search', query=query, page=page+1)|replace('+', '%20') }}">Next Page</a>
+               {% endif %}
+           {% endif %}
+       {% endif %}
+   </div>
+</body>
+</html>
