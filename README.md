@@ -1,6 +1,7 @@
 # search_engine
 The file should include mileStone1.py, mileStone2.py, calculateTFIDF.py, app.py, /DEV and /templates
 - /DEV contains the json files with the html pages
+- DEV folder is a huge folder, you can download it using this link: https://drive.google.com/file/d/1KkMnKaOJPBXv85zG0hNp8RRIWrDVWJfy/view?usp=sharing
 - /templates contains index.html and results.html
 
 ## Installation:
