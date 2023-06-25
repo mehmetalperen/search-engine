@@ -93,56 +93,55 @@ def boolean_and_search(boolean_query_list):
 
         least_seen_word = list(boolean_query_list[0].keys())[0]  # 'decemb'
 
-        baseList = [] #baseList is the list of docID's that are in the least_seen_word
+        base_list = [] #baseList is the list of docID's that are in the least_seen_word
         
         for posting in least_seen_word_object[least_seen_word]: #posting = [4, [1826, 1917], 2]
-                baseList.append([posting[0], posting[2]]) #docID = posting[0], tf-idf = posting[2]
+                base_list.append([posting[0], posting[2]]) #docID = posting[0], tf-idf = posting[2]
 
         if len(boolean_query_list) == 1: #if its 1 query term, then write out the documents that have that term
-            return baseList
+            return base_list
 
 
-        minTFIDF = 0
-        firstFewCount = 150
+        min_TFIDF = 0
+        first_few_count = 150
         
-        for curTerm in boolean_query_list: #for every term in the query list
-            for token in curTerm: #should only be 1
+        for cur_term in boolean_query_list: #for every term in the query list
+            for token in cur_term: #should only be 1
                 i = 0
                 j = 0
-                while i < len(baseList): # for every element in the baselist
+                while i < len(base_list): # for every element in the baselist
 
                     #calculate new minimum tf-idf to look for up until the "firstFewCount" runs out
-                    if firstFewCount > 0:
-                        firstFewCount -= 1
-                        if minTFIDF > baseList[i][1]: #compare current minimum with the base list
-                            minTFIDF = baseList[i][1]
+                    if first_few_count > 0:
+                        first_few_count -= 1
+                        if min_TFIDF > base_list[i][1]: #compare current minimum with the base list
+                            min_TFIDF = base_list[i][1]
                     else:
-                        if minTFIDF > baseList[i][1]:
-                            print("deletes...")
-                            del baseList[i]
+                        if min_TFIDF > base_list[i][1]:
+                            del base_list[i]
                             continue
 
-                    while j < len(curTerm[token]): # for every posting in the current term
-                        curPosting = curTerm[token][j] #note: curTerm[token][j] gives a posting, curPosting[0] gives the docID
-                        if curPosting[0] > baseList[i][0]: #if current posting's doc id is greater than the baseList's doc id
-                            del baseList[i]
+                    while j < len(cur_term[token]): # for every posting in the current term
+                        cur_posting = cur_term[token][j] #note: curTerm[token][j] gives a posting, curPosting[0] gives the docID
+                        if cur_posting[0] > base_list[i][0]: #if current posting's doc id is greater than the baseList's doc id
+                            del base_list[i]
                             i -= 1 #decriment it because it will be incrimented later (an incriment + a delition will make it go forward two spots)
-                            if len(baseList) == 0:
-                                return baseList #return empty list if empty
+                            if len(base_list) == 0:
+                                return base_list #return empty list if empty
                             else:
                                 break #go to the next element in baselist (with the i+= below), keep current position in curTerm[token]
-                        elif curPosting[0] == baseList[i][0]: #if current posting has the same docID, add it to the list and add to baseList docID's tf-idf
-                            baseList[i][1] += curPosting[2]
+                        elif cur_posting[0] == base_list[i][0]: #if current posting has the same docID, add it to the list and add to baseList docID's tf-idf
+                            base_list[i][1] += cur_posting[2]
                             j += 1 #go to the next element in baselist (with the i+= below), incriment to next position in curTerm[token]
                             break
                         j += 1 #if nothing above, just incriment j to go to the next posting
 
                     i += 1
 
-        baseList.sort(key = lambda x: x[1], reverse = True) #sort according to tfIDF
-        if len(baseList) > 500: #get the top 200 documents
-            baseList = baseList[:500]
-        return baseList
+        base_list.sort(key = lambda x: x[1], reverse = True) #sort according to tfIDF
+        if len(base_list) > 500: #get the top 200 documents
+            base_list = base_list[:500]
+        return base_list
 
                         
 
@@ -159,7 +158,7 @@ def nGram_result(query_docsID_tfidf, boolean_query_list): #query term list, quer
     for docID_tfidf in query_docsID_tfidf:
         docID = docID_tfidf[0]
         tfidf = docID_tfidf[1]
-        partial_ngrams = nGramDoc(docID, boolean_query_list) #returns an int of the number of partial ngrams found
+        partial_ngrams = nGram_doc(docID, boolean_query_list) #returns an int of the number of partial ngrams found
         doc_ngram_count.append([docID, partial_ngrams + tfidf])
         intesection_docID.add(docID)
     
@@ -168,59 +167,59 @@ def nGram_result(query_docsID_tfidf, boolean_query_list): #query term list, quer
 
 
 #returns an int of the number of partial ngrams found
-def nGramDoc(docID, boolean_query_list):
+def nGram_doc(docID, boolean_query_list):
     #print("nGramDoc:")
-    tokenPosInDoc = [] #token positions will be a list of lists (one list of positions for each term in the document)
+    token_pos = [] #token positions will be a list of lists (one list of positions for each term in the document)
 
-    tfidfScore = 0
+    tfidf_score = 0
     for posting_list in boolean_query_list:
         found = False
         for token in posting_list: #should only be 1
             for posting in posting_list[token]:
                 if posting[0] == docID: #when you find the docID for this posting, return its list of positions
                     found = True
-                    tokenPosInDoc.append(posting[1]) #get its positions in this document
-                    tfidfScore = posting[2] #get its current tfidf
+                    token_pos.append(posting[1]) #get its positions in this document
+                    tfidf_score = posting[2] #get its current tfidf
                     break
             if found:
                 break
 
-    indexPos = [0] * len(tokenPosInDoc) #indexPos is the current index you are looking at for that token in this document
+    index_pos = [0] * len(token_pos) #indexPos is the current index you are looking at for that token in this document
     count = 0 #count is the number of times you found sequential words in the order of which they were entered
-    lastIndex = len(indexPos) - 1 #save the last index
+    last_index = len(index_pos) - 1 #save the last index
 
-    minIndex = getMinIndex(indexPos, tokenPosInDoc) #gets the first index where this term appears in this document
+    min_index = get_min_index(index_pos, token_pos) #gets the first index where this term appears in this document
     while(True):
 
         #if the minIndex is not the last index AND the current and the current token's position - the next token's position has a difference of only one (then they follow each other)
-        if lastIndex != minIndex and tokenPosInDoc[minIndex][indexPos[minIndex]] - tokenPosInDoc[minIndex + 1][indexPos[minIndex + 1]] == 1:
+        if last_index != min_index and token_pos[min_index][index_pos[min_index]] - token_pos[min_index + 1][index_pos[min_index + 1]] == 1:
             count += 1
-            indexPos[minIndex] += 1 #incriment the next minimum index of this term
-            if(len(tokenPosInDoc[minIndex]) <= indexPos[minIndex]): #if it reached the end of this list, break cuz the query n-gram is not not relavent
+            index_pos[min_index] += 1 #incriment the next minimum index of this term
+            if(len(token_pos[min_index]) <= index_pos[min_index]): #if it reached the end of this list, break cuz the query n-gram is not not relavent
                 break
                 
-            minIndex += 1 #make the minIndex one more as the next term is shown to follow this one
+            min_index += 1 #make the minIndex one more as the next term is shown to follow this one
         else: #if the index after it is not the next word in the query and it is not the last index, then incriment the current term and compute the next index
-            indexPos[minIndex] += 1 #incriment the next minimum index of this term
-            if(len(tokenPosInDoc[minIndex]) <= indexPos[minIndex]): #if it reached the end of this list, break cuz the query n-gram is not not relavent
+            index_pos[min_index] += 1 #incriment the next minimum index of this term
+            if(len(token_pos[min_index]) <= index_pos[min_index]): #if it reached the end of this list, break cuz the query n-gram is not not relavent
                 break
-            minIndex = getMinIndex(indexPos, tokenPosInDoc)
+            min_index = get_min_index(index_pos, token_pos)
 
     return count
 
         
 
-def getMinIndex(indexPos, tokenPosInDoc):
+def get_min_index(index_pos, token_pos):
     i = 0
-    minIndex = 0
-    curMinVal = 0
-    while i < len(indexPos):
-        if tokenPosInDoc[i][indexPos[i]] < curMinVal:
-            curMinVal = tokenPosInDoc[i][indexPos[i]] 
-            minIndex = i
+    min_index = 0
+    cur_min_val = 0
+    while i < len(index_pos):
+        if token_pos[i][index_pos[i]] < cur_min_val:
+            cur_min_val = token_pos[i][index_pos[i]] 
+            min_index = i
         i += 1
     
-    return minIndex
+    return min_index
 
 
 def generate_boolean_or_search_result(boolean_query_list, intersection_docIDs):

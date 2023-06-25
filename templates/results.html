@@ -3,90 +3,133 @@
 <head>
    <title>Search Results</title>
    <style>
-       body {
-           background-color: #222;
-           color: #eee;
-           font-family: Arial, sans-serif;
-           margin: 0;
-           padding: 0;
-       }
+      /* Global Styles */
+      body {
+        background-color: #1f1f1f;
+        color: #fff;
+        font-family: Arial, sans-serif;
+      }
 
-       .container {
-           max-width: 800px;
-           margin: 0 auto;
-           padding: 20px;
-       }
+      a {
+        color: #fff;
+      }
 
-       h2 {
-           margin-bottom: 10px;
-       }
+      /* Header Styles */
+      header {
+        background-color: #000;
+        padding: 20px;
+      }
 
-       form {
-           margin-bottom: 20px;
-       }
+      h1 {
+        font-size: 28px;
+        margin: 0;
+        color: #fff;
+      }
 
-       input[type="text"] {
-           width: 300px;
-           padding: 5px;
-           border: none;
-           background-color: #333;
-           color: #eee;
-       }
+      /* Form Styles */
+      form {
+        margin-top: 20px;
+        padding: 20px;
+      }
 
-       button {
-           padding: 5px 10px;
-           border: none;
-           background-color: #777;
-           color: #eee;
-           cursor: pointer;
-       }
 
-       h1 {
-           margin-top: 30px;
-       }
+      input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: none;
+        width: 500px; /* this makes the search bar longer */
+      }
 
-       ul {
-           list-style-type: none;
-           padding: 0;
-       }
+      button[type="submit"] {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-       li {
-           margin-bottom: 10px;
-       }
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        gap: 20px;  /* adjust this as needed to increase or decrease the gap */
+      }
 
-       a {
-           text-decoration: none;
-           color: #00a0e9;
-       }
+      /* Dark Mode Styles */
+      body.dark-mode {
+        background-color: #000;
+        color: #fff;
+      }
+
+      body.dark-mode a {
+        color: #fff;
+      }
+
+      body.dark-mode header {
+        background-color: #111;
+      }
+
+      body.dark-mode h1 {
+        color: #fff;
+      }
+
+      body.dark-mode form {
+        background-color: #111;
+      }
+
+      body.dark-mode input[type="text"] {
+        background-color: #111;
+        color: #fff;
+      }
+
+      body.dark-mode button[type="submit"] {
+        background-color: #000;
+        color: #fff;
+      }
    </style>
 </head>
 <body>
-   <div class="container">
-       <h2>Perform Another Search</h2>
-       <form action="{{ url_for('perform_search') }}" method="GET">
-           <input type="text" name="query" placeholder="Enter your search query" required>
-           <button type="submit">Search</button>
-       </form>
+   <header>
+      <h1>Perform Another Search</h1>
+   </header>
 
-       {% if query %}
-           <h1>Search Results for "{{ query }}"</h1>
-           <h2>Took {{ search_time }} ms</h2>
-           <ul>
-                <li>Your top results are:</li>
-               {% for result, summary in results %}
-                   <li><a href="{{ result }}">{{ result }}</a>  <p>{{summary}}</p>  </li>
-               {% endfor %}
-           </ul>
+   <!-- Form to submit another search query -->
+   <form action="{{ url_for('perform_search') }}" method="GET">
+       <input type="text" name="query" placeholder="Enter your search query" required>
+       <button type="submit">Search</button>
+   </form>
 
-           {% if results %}
-               {% if page > 1 %}
-                   <a href="{{ url_for('perform_search', query=query, page=page-1)|replace('+', '%20') }}">Previous Page</a>
-               {% endif %}
-               {% if num_remaining > 0 %}
-                   <a href="{{ url_for('perform_search', query=query, page=page+1)|replace('+', '%20') }}">Next Page</a>
-               {% endif %}
+   <h1>Search Results for "{{ query }}"</h1>
+   
+   <ul>
+       <!-- Loop through the results and display them as list items -->
+       {% for result in results %}
+           <li><a href="{{ result }}">{{ result }}</a></li>
+       {% endfor %}
+   </ul>
+
+   {% if results %}
+       <!-- Pagination -->
+       <div class="pagination">
+           {% if page > 1 %}
+               <!-- Link to previous page if current page is greater than 1 -->
+               <a href="{{ url_for('perform_search', query=query, page=page-1)|replace('+', '%20') }}">Previous Page</a>
            {% endif %}
-       {% endif %}
-   </div>
+           {% if results|length >= 10 %}
+               <!-- Link to next page if there are more results to display -->
+               <a href="{{ url_for('perform_search', query=query, page=page+1)|replace('+', '%20') }}">Next Page</a>
+           {% endif %}
+       </div>
+   {% endif %}
+   
+   <script>
+      // JavaScript code to toggle dark mode
+      function toggleDarkMode() {
+         const body = document.querySelector('body');
+         body.classList.toggle('dark-mode');
+      }
+   </script>
 </body>
 </html>
