@@ -32,4 +32,4 @@ Once a search is performed, it renders the result to results.html and waits for 
 
 Perform a query by typing in the text box on the GUI and returning.
     		  
-In the terminal, run ```python3 mileStone2.py```.
+In the terminal, run ```python3 app.py```.
