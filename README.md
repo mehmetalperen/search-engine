@@ -1,4 +1,6 @@
 # search_engine
+![Screen_Recording_2023-06-24_at_11_11_52_PM_AdobeExpress](https://github.com/mehmetalperen/search-engine/assets/31394639/c9c58035-b068-4051-b434-7582ca8a8ce1)
+
 The file should include mileStone1.py, mileStone2.py, calculateTFIDF.py, app.py, /DEV and /templates
 - /DEV contains the json files with the html pages
 - DEV folder is a huge folder, you can download it using this link: https://drive.google.com/file/d/1KkMnKaOJPBXv85zG0hNp8RRIWrDVWJfy/view?usp=sharing
